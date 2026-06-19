@@ -17,6 +17,7 @@ const messages = defineMessages({
 const WebGlModal = ({intl, ...props}) => (
     <ReactModal
         isOpen
+        closeTimeoutMS={240}
         className={styles.modalContent}
         contentLabel={intl.formatMessage({...messages.label})}
         overlayClassName={styles.modalOverlay}

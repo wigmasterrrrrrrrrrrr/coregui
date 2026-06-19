@@ -134,6 +134,7 @@ class TelemetryModal extends React.PureComponent {
         );
         return (<ReactModal
             isOpen
+            closeTimeoutMS={240}
             className={styles.modalContent}
             contentLabel={this.props.intl.formatMessage(messages.label)}
             overlayClassName={styles.modalOverlay}

@@ -16,6 +16,7 @@ import styles from './modal.css';
 const ModalComponent = props => (
     <ReactModal
         isOpen
+        closeTimeoutMS={240}
         className={classNames(styles.modalContent, props.className, {
             [styles.fullScreen]: props.fullScreen
         })}

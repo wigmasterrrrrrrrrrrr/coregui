@@ -34,6 +34,7 @@ const BrowserModal = ({intl, ...props}) => {
     return (
         <ReactModal
             isOpen
+            closeTimeoutMS={240}
             className={styles.modalContent}
             contentLabel={intl.formatMessage(title)}
             overlayClassName={styles.modalOverlay}
