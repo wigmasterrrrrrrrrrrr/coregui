@@ -1,0 +1,38 @@
+{
+  "version": 3,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|woff2|woff|ttf|webmanifest|ico|json))$",
+      "dest": "/$1"
+    },
+    {
+      "src": "/fullscreen/?$",
+      "dest": "/fullscreen.html"
+    },
+    {
+      "src": "/editor/?$",
+      "dest": "/editor.html"
+    },
+    {
+      "src": "/embed/?$",
+      "dest": "/embed.html"
+    },
+    {
+      "src": "/addons/?$",
+      "dest": "/addons.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

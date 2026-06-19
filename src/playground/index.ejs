@@ -61,6 +61,10 @@
       .splash-error-list {
         white-space: pre-wrap;
       }
+      .splash-screen {
+        opacity: 1;
+        transition: opacity 0.35s ease;
+      }
       .splash-reset {
         color: inherit;
         background: none;
@@ -72,6 +76,10 @@
       }
       .splash-reset:disabled {
         opacity: 0.8;
+      }
+      #app {
+        opacity: 0;
+        transform: translateY(12px);
       }
     </style>
   </head>
@@ -180,8 +188,11 @@
         };
 
         window.SplashEnd = () => {
-          splash.hidden = true;
+          splash.style.opacity = '0';
           window.onerror = null;
+          setTimeout(function () {
+            splash.hidden = true;
+          }, 350);
         };
       })();
     </script>
