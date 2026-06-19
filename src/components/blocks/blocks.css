@@ -84,6 +84,33 @@
     z-index: $z-index-drag-layer; /* make blocks match gui drag layer */
 }
 
+.blocks :global(.blocklyDragging) {
+    transform-box: fill-box;
+    transform-origin: center center;
+    will-change: transform, filter;
+    animation: blocklyDragSwish 220ms cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.blocks :global(.blocklyDragging>.blocklyPath),
+.blocks :global(.blocklyDragging>.blocklyPathLight) {
+    filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.14));
+}
+
+@keyframes blocklyDragSwish {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+    30% {
+        transform: translate(4px, -2px) rotate(2deg) scale(1.01);
+    }
+    60% {
+        transform: translate(-2px, 1px) rotate(-1deg) scale(1.005);
+    }
+    100% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+}
+
 /*
     Shrink category font to fit "My Blocks" for now.
     Probably will need different solutions for language support later, so

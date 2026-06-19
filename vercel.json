@@ -31,6 +31,10 @@
       "dest": "/addons.html"
     },
     {
+      "src": "/transition/?$",
+      "dest": "/index.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
