@@ -84,15 +84,14 @@
     z-index: $z-index-drag-layer; /* make blocks match gui drag layer */
 }
 
-.blocks :global(.blocklyDragging) {
-    transform-box: fill-box;
+.blocks :global(.blocklyDragging):not(.reporter) {
     transform-origin: center center;
     will-change: transform, filter;
-    animation: blocklyDragSwish 220ms cubic-bezier(0.25, 0.8, 0.25, 1);
+    animation: blocklyDragSwish 220ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
 }
 
-.blocks :global(.blocklyDragging>.blocklyPath),
-.blocks :global(.blocklyDragging>.blocklyPathLight) {
+.blocks :global(.blocklyDragging):not(.reporter)>.blocklyPath,
+.blocks :global(.blocklyDragging):not(.reporter)>.blocklyPathLight {
     filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.14));
 }
 

@@ -10,14 +10,6 @@
     --ui-overlay-animation-duration: 220ms;
 }
 
-:global(*),
-:global(*::before),
-:global(*::after) {
-    transition-property: background-color, color, border-color, box-shadow, opacity, transform, filter;
-    transition-duration: var(--ui-animation-duration);
-    transition-timing-function: var(--ui-animation-easing);
-}
-
 :global(.ReactModal__Overlay) {
     opacity: 0;
     transition-property: opacity, background-color;
