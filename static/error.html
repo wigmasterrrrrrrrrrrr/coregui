@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>404 error page not found</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1b2638;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-shell {
+            width: 100%;
+            max-width: 720px;
+            padding: 32px;
+            box-sizing: border-box;
+        }
+
+        .error-card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 24px 80px rgba(32, 48, 80, 0.12);
+            overflow: hidden;
+        }
+
+        .error-hero {
+            background: #4c97ff;
+            color: white;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .error-hero h1 {
+            margin: 0;
+            font-size: clamp(2.4rem, 4vw, 3.6rem);
+            line-height: 1;
+        }
+
+        .error-content {
+            padding: 32px;
+            line-height: 1.7;
+        }
+
+        .error-content p {
+            margin: 0 0 18px;
+        }
+
+        .error-content a {
+            color: #4c97ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .error-content a:hover {
+            text-decoration: underline;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #111821;
+                color: #e8eff8;
+            }
+
+            .error-card {
+                background: #14203c;
+                box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+            }
+
+            .error-hero {
+                background: #1e5dc7;
+            }
+
+            .error-content a {
+                color: #89b7ff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-shell">
+        <div class="error-card">
+            <div class="error-hero">
+                <h1>404 error page not found</h1>
+            </div>
+            <div class="error-content">
+                <p>The page you are looking for could not be found.</p>
+                <p>Try going back to the homepage or open the editor directly.</p>
+                <p><a href="/">Return to home</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

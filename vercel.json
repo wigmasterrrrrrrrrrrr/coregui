@@ -38,5 +38,9 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "error": {
+    "src": "/(.*)",
+    "dest": "/error.html"
+  }
 }
