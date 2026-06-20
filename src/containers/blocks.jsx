@@ -132,9 +132,6 @@ class Blocks extends React.Component {
             prompt: null
         };
         this._lastPointer = null;
-        this._draggingElements = new Map();
-        this._rafId = null;
-        this._smoothing = 0.15; // interpolation factor for smoothing
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
         this.toolboxUpdateQueue = [];
     }
@@ -234,101 +231,49 @@ class Blocks extends React.Component {
 
         gentlyRequestPersistentStorage();
 
-        // Pointer tracking to add a small rotation while dragging blocks when moved quickly.
-        // This is intentionally lightweight and only manipulates the SVG `transform` attribute
-        // for elements that currently have the `.blocklyDragging` class.
+        // Pointer tracking to add a subtle visual tilt while dragging blocks.
+        // This updates CSS variables only, so Blockly's own drag transform is left intact.
         this._pointerMoveHandler = (e) => {
             try {
                 const t = e.timeStamp || Date.now();
                 const x = e.clientX;
                 const y = e.clientY;
-                if (this._lastPointer && t > this._lastPointer.t) {
-                    const dt = Math.max(1, t - this._lastPointer.t);
-                    const dx = x - this._lastPointer.x;
-                    const dy = y - this._lastPointer.y;
-                    const speed = Math.sqrt(dx * dx + dy * dy) / dt; // px per ms
-
-                    // Map speed to a small rotation angle (deg). Tuned to be subtle.
-                    const angle = Math.sign(dx) * Math.min(8, speed * 60);
-
-                    const dragging = Array.from(document.querySelectorAll('.blocklyDragging'));
-                    dragging.forEach(el => {
-                        // skip reporter-shaped blocks to avoid visual issues
-                        const shapes = el.getAttribute && el.getAttribute('data-shapes');
-                        if (shapes && shapes.indexOf('reporter') !== -1) return;
-
-                        if (!this._draggingElements.has(el)) {
-                            const orig = el.getAttribute('transform') || '';
-                            let cx = 0; let cy = 0;
-                            try {
-                                const bbox = el.getBBox();
-                                cx = bbox.x + bbox.width / 2;
-                                cy = bbox.y + bbox.height / 2;
-                            } catch (err) {
-                                // ignore getBBox errors
-                            }
-                            this._draggingElements.set(el, {orig, cx, cy, currentAngle: 0, targetAngle: 0});
-                        }
-                        const info = this._draggingElements.get(el);
-                        info.targetAngle = angle;
-                    });
-
-                    // start RAF loop to smoothly interpolate angles
-                    if (!this._rafId) {
-                        const rafLoop = () => {
-                            let anyAnimating = false;
-                            for (const [el, info] of this._draggingElements.entries()) {
-                                const diff = info.targetAngle - info.currentAngle;
-                                if (Math.abs(diff) > 0.01) {
-                                    info.currentAngle += diff * this._smoothing;
-                                    anyAnimating = true;
-                                } else {
-                                    info.currentAngle = info.targetAngle;
-                                }
-                                const newTransform = `${info.orig} rotate(${info.currentAngle} ${info.cx} ${info.cy})`;
-                                try { el.setAttribute('transform', newTransform); } catch (err) {}
-                            }
-                            if (anyAnimating) {
-                                this._rafId = window.requestAnimationFrame(rafLoop);
-                            } else {
-                                this._rafId = null;
-                            }
-                        };
-                        this._rafId = window.requestAnimationFrame(rafLoop);
-                    }
+                if (!this._lastPointer || t <= this._lastPointer.t) {
+                    this._lastPointer = {t, x, y};
+                    return;
                 }
+
+                const dt = Math.max(1, t - this._lastPointer.t);
+                const dx = x - this._lastPointer.x;
+                const dy = y - this._lastPointer.y;
+                const speed = Math.sqrt(dx * dx + dy * dy) / dt;
+                const angle = Math.sign(dx || dy) * Math.min(6, speed * 40);
+
+                const dragging = Array.from(document.querySelectorAll('.blocklyDragging'));
+                dragging.forEach(el => {
+                    const shapes = el.getAttribute && el.getAttribute('data-shapes');
+                    if (shapes && shapes.indexOf('reporter') !== -1) return;
+
+                    el.style.setProperty('--drag-tilt', `${angle}deg`);
+                    el.style.setProperty('--drag-scale', speed > 0.8 ? '1.01' : '1');
+                });
+
                 this._lastPointer = {t, x, y};
             } catch (err) {
                 // never break dragging if this fails
-                return;
             }
         };
 
         this._pointerUpHandler = () => {
-            // animate back to zero and then restore original transforms
             try {
-                for (const [el, info] of this._draggingElements.entries()) {
-                    info.targetAngle = 0;
-                }
-                // let RAF handle returning to zero; after a short delay clear originals
-                setTimeout(() => {
-                    try {
-                        for (const [el, info] of this._draggingElements.entries()) {
-                            if (info && typeof info.orig === 'string') {
-                                el.setAttribute('transform', info.orig);
-                            }
-                        }
-                    } catch (err) {}
-                    this._draggingElements = new Map();
-                }, 220);
+                Array.from(document.querySelectorAll('.blocklyDragging')).forEach(el => {
+                    el.style.removeProperty('--drag-tilt');
+                    el.style.removeProperty('--drag-scale');
+                });
             } catch (err) {
                 // ignore
             }
             this._lastPointer = null;
-            if (this._rafId) {
-                window.cancelAnimationFrame(this._rafId);
-                this._rafId = null;
-            }
         };
 
         window.addEventListener('pointermove', this._pointerMoveHandler, {passive: true});
@@ -399,13 +344,11 @@ class Blocks extends React.Component {
         this.props.vm.clearFlyoutBlocks();
 
         AddonHooks.blocklyWorkspace = null;
-        // cleanup pointer handlers added for drag rotation
         try {
             if (this._pointerMoveHandler) window.removeEventListener('pointermove', this._pointerMoveHandler);
             if (this._pointerUpHandler) {
                 window.removeEventListener('pointerup', this._pointerUpHandler);
                 window.removeEventListener('pointercancel', this._pointerUpHandler);
-                // reset any modified transforms
                 this._pointerUpHandler();
             }
         } catch (err) {
