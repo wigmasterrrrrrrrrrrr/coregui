@@ -132,7 +132,9 @@ class Blocks extends React.Component {
             prompt: null
         };
         this._lastPointer = null;
-        this._draggingElements = new WeakMap();
+        this._draggingElements = new Map();
+        this._rafId = null;
+        this._smoothing = 0.15; // interpolation factor for smoothing
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
         this.toolboxUpdateQueue = [];
     }
@@ -265,13 +267,35 @@ class Blocks extends React.Component {
                             } catch (err) {
                                 // ignore getBBox errors
                             }
-                            this._draggingElements.set(el, {orig, cx, cy});
+                            this._draggingElements.set(el, {orig, cx, cy, currentAngle: 0, targetAngle: 0});
                         }
-                        const info = this._draggingElements.get(el) || {orig: ''};
-                        // Apply rotate around the element center.
-                        const newTransform = `${info.orig} rotate(${angle} ${info.cx} ${info.cy})`;
-                        el.setAttribute('transform', newTransform);
+                        const info = this._draggingElements.get(el);
+                        info.targetAngle = angle;
                     });
+
+                    // start RAF loop to smoothly interpolate angles
+                    if (!this._rafId) {
+                        const rafLoop = () => {
+                            let anyAnimating = false;
+                            for (const [el, info] of this._draggingElements.entries()) {
+                                const diff = info.targetAngle - info.currentAngle;
+                                if (Math.abs(diff) > 0.01) {
+                                    info.currentAngle += diff * this._smoothing;
+                                    anyAnimating = true;
+                                } else {
+                                    info.currentAngle = info.targetAngle;
+                                }
+                                const newTransform = `${info.orig} rotate(${info.currentAngle} ${info.cx} ${info.cy})`;
+                                try { el.setAttribute('transform', newTransform); } catch (err) {}
+                            }
+                            if (anyAnimating) {
+                                this._rafId = window.requestAnimationFrame(rafLoop);
+                            } else {
+                                this._rafId = null;
+                            }
+                        };
+                        this._rafId = window.requestAnimationFrame(rafLoop);
+                    }
                 }
                 this._lastPointer = {t, x, y};
             } catch (err) {
@@ -281,19 +305,30 @@ class Blocks extends React.Component {
         };
 
         this._pointerUpHandler = () => {
-            // reset any modified transforms back to original
+            // animate back to zero and then restore original transforms
             try {
-                Array.from(this._draggingElements.keys()).forEach(el => {
-                    const info = this._draggingElements.get(el);
-                    if (info && typeof info.orig === 'string') {
-                        el.setAttribute('transform', info.orig);
-                    }
-                });
+                for (const [el, info] of this._draggingElements.entries()) {
+                    info.targetAngle = 0;
+                }
+                // let RAF handle returning to zero; after a short delay clear originals
+                setTimeout(() => {
+                    try {
+                        for (const [el, info] of this._draggingElements.entries()) {
+                            if (info && typeof info.orig === 'string') {
+                                el.setAttribute('transform', info.orig);
+                            }
+                        }
+                    } catch (err) {}
+                    this._draggingElements = new Map();
+                }, 220);
             } catch (err) {
                 // ignore
             }
-            this._draggingElements = new WeakMap();
             this._lastPointer = null;
+            if (this._rafId) {
+                window.cancelAnimationFrame(this._rafId);
+                this._rafId = null;
+            }
         };
 
         window.addEventListener('pointermove', this._pointerMoveHandler, {passive: true});
