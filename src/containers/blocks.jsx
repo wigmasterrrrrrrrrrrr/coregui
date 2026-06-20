@@ -131,6 +131,8 @@ class Blocks extends React.Component {
         this.state = {
             prompt: null
         };
+        this._lastPointer = null;
+        this._draggingElements = new WeakMap();
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
         this.toolboxUpdateQueue = [];
     }
@@ -229,6 +231,74 @@ class Blocks extends React.Component {
         }
 
         gentlyRequestPersistentStorage();
+
+        // Pointer tracking to add a small rotation while dragging blocks when moved quickly.
+        // This is intentionally lightweight and only manipulates the SVG `transform` attribute
+        // for elements that currently have the `.blocklyDragging` class.
+        this._pointerMoveHandler = (e) => {
+            try {
+                const t = e.timeStamp || Date.now();
+                const x = e.clientX;
+                const y = e.clientY;
+                if (this._lastPointer && t > this._lastPointer.t) {
+                    const dt = Math.max(1, t - this._lastPointer.t);
+                    const dx = x - this._lastPointer.x;
+                    const dy = y - this._lastPointer.y;
+                    const speed = Math.sqrt(dx * dx + dy * dy) / dt; // px per ms
+
+                    // Map speed to a small rotation angle (deg). Tuned to be subtle.
+                    const angle = Math.sign(dx) * Math.min(8, speed * 60);
+
+                    const dragging = Array.from(document.querySelectorAll('.blocklyDragging'));
+                    dragging.forEach(el => {
+                        // skip reporter-shaped blocks to avoid visual issues
+                        const shapes = el.getAttribute && el.getAttribute('data-shapes');
+                        if (shapes && shapes.indexOf('reporter') !== -1) return;
+
+                        if (!this._draggingElements.has(el)) {
+                            const orig = el.getAttribute('transform') || '';
+                            let cx = 0; let cy = 0;
+                            try {
+                                const bbox = el.getBBox();
+                                cx = bbox.x + bbox.width / 2;
+                                cy = bbox.y + bbox.height / 2;
+                            } catch (err) {
+                                // ignore getBBox errors
+                            }
+                            this._draggingElements.set(el, {orig, cx, cy});
+                        }
+                        const info = this._draggingElements.get(el) || {orig: ''};
+                        // Apply rotate around the element center.
+                        const newTransform = `${info.orig} rotate(${angle} ${info.cx} ${info.cy})`;
+                        el.setAttribute('transform', newTransform);
+                    });
+                }
+                this._lastPointer = {t, x, y};
+            } catch (err) {
+                // never break dragging if this fails
+                return;
+            }
+        };
+
+        this._pointerUpHandler = () => {
+            // reset any modified transforms back to original
+            try {
+                Array.from(this._draggingElements.keys()).forEach(el => {
+                    const info = this._draggingElements.get(el);
+                    if (info && typeof info.orig === 'string') {
+                        el.setAttribute('transform', info.orig);
+                    }
+                });
+            } catch (err) {
+                // ignore
+            }
+            this._draggingElements = new WeakMap();
+            this._lastPointer = null;
+        };
+
+        window.addEventListener('pointermove', this._pointerMoveHandler, {passive: true});
+        window.addEventListener('pointerup', this._pointerUpHandler);
+        window.addEventListener('pointercancel', this._pointerUpHandler);
     }
     shouldComponentUpdate (nextProps, nextState) {
         return (
@@ -294,6 +364,18 @@ class Blocks extends React.Component {
         this.props.vm.clearFlyoutBlocks();
 
         AddonHooks.blocklyWorkspace = null;
+        // cleanup pointer handlers added for drag rotation
+        try {
+            if (this._pointerMoveHandler) window.removeEventListener('pointermove', this._pointerMoveHandler);
+            if (this._pointerUpHandler) {
+                window.removeEventListener('pointerup', this._pointerUpHandler);
+                window.removeEventListener('pointercancel', this._pointerUpHandler);
+                // reset any modified transforms
+                this._pointerUpHandler();
+            }
+        } catch (err) {
+            // ignore cleanup errors
+        }
     }
     requestToolboxUpdate () {
         clearTimeout(this.toolboxUpdateTimeout);
