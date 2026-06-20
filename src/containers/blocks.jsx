@@ -132,6 +132,7 @@ class Blocks extends React.Component {
             prompt: null
         };
         this._lastPointer = null;
+        this._dragGhostMap = new WeakMap();
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
         this.toolboxUpdateQueue = [];
     }
@@ -232,7 +233,8 @@ class Blocks extends React.Component {
         gentlyRequestPersistentStorage();
 
         // Pointer tracking to add a subtle visual tilt while dragging blocks.
-        // This updates CSS variables only, so Blockly's own drag transform is left intact.
+        // The effect is rendered on a non-interactive ghost copy so Blockly's own drag
+        // placement logic stays intact.
         this._pointerMoveHandler = (e) => {
             try {
                 const t = e.timeStamp || Date.now();
@@ -247,15 +249,39 @@ class Blocks extends React.Component {
                 const dx = x - this._lastPointer.x;
                 const dy = y - this._lastPointer.y;
                 const speed = Math.sqrt(dx * dx + dy * dy) / dt;
-                const angle = Math.sign(dx || dy) * Math.min(6, speed * 40);
+                const angle = Math.sign(dx || dy) * Math.min(3, speed * 20);
 
                 const dragging = Array.from(document.querySelectorAll('.blocklyDragging'));
                 dragging.forEach(el => {
                     const shapes = el.getAttribute && el.getAttribute('data-shapes');
                     if (shapes && shapes.indexOf('reporter') !== -1) return;
 
-                    el.style.setProperty('--drag-tilt', `${angle}deg`);
-                    el.style.setProperty('--drag-scale', speed > 0.8 ? '1.01' : '1');
+                    let ghost = this._dragGhostMap.get(el);
+                    if (!ghost) {
+                        ghost = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                        ghost.setAttribute('class', 'tw-drag-ghost');
+                        ghost.style.pointerEvents = 'none';
+                        ghost.style.opacity = '0.95';
+                        ghost.style.transformOrigin = 'center center';
+                        ghost.style.transformBox = 'fill-box';
+
+                        const clone = el.cloneNode(true);
+                        clone.classList.remove('blocklyDragging');
+                        clone.classList.remove('blocklyDraggable');
+                        clone.classList.add('tw-drag-clone');
+                        clone.style.pointerEvents = 'none';
+                        ghost.appendChild(clone);
+
+                        const parent = el.parentNode;
+                        if (parent) {
+                            parent.appendChild(ghost);
+                        }
+                        this._dragGhostMap.set(el, ghost);
+                    }
+
+                    const transform = el.getAttribute('transform') || '';
+                    ghost.setAttribute('transform', transform);
+                    ghost.style.transform = `rotate(${angle}deg)`;
                 });
 
                 this._lastPointer = {t, x, y};
@@ -266,13 +292,15 @@ class Blocks extends React.Component {
 
         this._pointerUpHandler = () => {
             try {
-                Array.from(document.querySelectorAll('.blocklyDragging')).forEach(el => {
-                    el.style.removeProperty('--drag-tilt');
-                    el.style.removeProperty('--drag-scale');
+                this._dragGhostMap.forEach(ghost => {
+                    if (ghost && ghost.parentNode) {
+                        ghost.parentNode.removeChild(ghost);
+                    }
                 });
             } catch (err) {
                 // ignore
             }
+            this._dragGhostMap = new WeakMap();
             this._lastPointer = null;
         };
 

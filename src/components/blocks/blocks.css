@@ -84,21 +84,9 @@
     z-index: $z-index-drag-layer; /* make blocks match gui drag layer */
 }
 
-.blocks :global(.blocklyDragging) {
-    --drag-tilt: 0deg;
-    --drag-scale: 1;
-}
-
-.blocks :global(.blocklyDragging) .blocklyPath,
-.blocks :global(.blocklyDragging) .blocklyPathLight {
-    transform: rotate(var(--drag-tilt)) scale(var(--drag-scale));
-    transform-origin: center center;
-    transform-box: fill-box;
-    transition: transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 120ms cubic-bezier(0.2, 0.8, 0.2, 1);
-    will-change: transform, filter;
-}
-
-.blocks :global(.blocklyDragging) .blocklyPath {
+.blocks :global(.tw-drag-ghost) {
+    pointer-events: none;
+    opacity: 0.95;
     filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.16));
 }
 
