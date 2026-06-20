@@ -35,6 +35,10 @@
       "dest": "/index.html"
     },
     {
+      "src": "/?",
+      "dest": "/home.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
