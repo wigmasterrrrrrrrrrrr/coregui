@@ -1,0 +1,264 @@
+@import "../../css/colors.css";
+@import "../../css/units.css";
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    background: $ui-primary;
+}
+
+.canvas-area {
+    flex-grow: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+.timeline-bar {
+    display: flex;
+    flex-direction: column;
+    background: $ui-tertiary;
+    border-top: 1px solid $ui-black-transparent;
+    flex-shrink: 0;
+}
+
+.controls-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-bottom: 1px solid $ui-black-transparent;
+    background: $ui-secondary;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.control-divider {
+    width: 1px;
+    height: 1.25rem;
+    background: $ui-black-transparent;
+    margin: 0 0.25rem;
+}
+
+.play-btn {
+    width: 2rem;
+    height: 1.75rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $motion-primary;
+    color: white;
+    font-size: 0.8rem;
+    transition: opacity 0.15s;
+}
+
+.play-btn:hover {
+    opacity: 0.85;
+}
+
+.play-btn.active {
+    background: $red-primary;
+}
+
+.fps-control {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: $text-primary;
+}
+
+.fps-input {
+    width: 2.5rem;
+    height: 1.5rem;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 0.2rem;
+    background: $input-background;
+    color: $text-primary;
+    text-align: center;
+    font-size: 0.7rem;
+    padding: 0;
+}
+
+.fps-input:focus {
+    outline: none;
+    border-color: $motion-primary;
+}
+
+.onion-btn {
+    height: 1.5rem;
+    padding: 0 0.5rem;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 0.2rem;
+    background: $input-background;
+    color: $text-primary;
+    font-size: 0.65rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.onion-btn:hover {
+    background: $ui-white-transparent;
+}
+
+.onion-btn.active {
+    background: $motion-tertiary;
+    color: white;
+    border-color: $motion-primary;
+}
+
+.step-btn {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 0.2rem;
+    background: $input-background;
+    color: $text-primary;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.step-btn:hover {
+    background: $ui-white-transparent;
+}
+
+.frame-counter {
+    font-size: 0.65rem;
+    color: $text-primary-transparent;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.timeline-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-height: 5rem;
+    scroll-behavior: smooth;
+}
+
+.timeline-strip::-webkit-scrollbar {
+    height: 4px;
+}
+
+.timeline-strip::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.timeline-strip::-webkit-scrollbar-thumb {
+    background: $ui-black-transparent;
+    border-radius: 2px;
+}
+
+.frame-thumb {
+    flex-shrink: 0;
+    width: 4rem;
+    height: 3.5rem;
+    border: 2px solid transparent;
+    border-radius: 0.3rem;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background: $ui-white;
+    transition: border-color 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.frame-thumb:hover {
+    border-color: $text-primary-transparent;
+}
+
+.frame-thumb.selected {
+    border-color: $motion-primary;
+    box-shadow: 0 0 0 1px $motion-primary;
+}
+
+.frame-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.frame-number {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 0.55rem;
+    text-align: center;
+    padding: 0.05rem 0;
+    line-height: 1;
+}
+
+.frame-add {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3.5rem;
+    border: 2px dashed $ui-black-transparent;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-primary-transparent;
+    font-size: 1.25rem;
+    transition: border-color 0.15s, color 0.15s;
+    background: transparent;
+}
+
+.frame-add:hover {
+    border-color: $motion-primary;
+    color: $motion-primary;
+}
+
+.frame-actions {
+    display: flex;
+    gap: 0.2rem;
+    flex-shrink: 0;
+    margin-left: 0.25rem;
+}
+
+.frame-action-btn {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 0.2rem;
+    background: $input-background;
+    color: $text-primary;
+    font-size: 0.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.frame-action-btn:hover {
+    background: $ui-white-transparent;
+}
+
+.frame-action-btn.danger:hover {
+    background: $red-primary;
+    color: white;
+}

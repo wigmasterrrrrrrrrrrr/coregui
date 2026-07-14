@@ -9,7 +9,7 @@ import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import tabStyles from 'react-tabs/style/react-tabs.css';
 import VM from 'scratch-vm';
 
-import CostumeTab from '../../containers/costume-tab.jsx';
+import AnimationEditor from '../animation-editor/animation-editor.jsx';
 import TargetPane from '../../containers/target-pane.jsx';
 import SoundTab from '../../containers/sound-tab.jsx';
 import StageWrapper from '../../containers/stage-wrapper.jsx';
@@ -328,19 +328,11 @@ const GUIComponent = props => {
                                             draggable={false}
                                             src={costumesIcon()}
                                         />
-                                        {targetIsStage ? (
-                                            <FormattedMessage
-                                                defaultMessage="Backdrops"
-                                                description="Button to get to the backdrops panel"
-                                                id="gui.gui.backdropsTab"
-                                            />
-                                        ) : (
-                                            <FormattedMessage
-                                                defaultMessage="Costumes"
-                                                description="Button to get to the costumes panel"
-                                                id="gui.gui.costumesTab"
-                                            />
-                                        )}
+                                        <FormattedMessage
+                                            defaultMessage="Animation"
+                                            description="Button to get to the animation editor panel"
+                                            id="gui.gui.animationTab"
+                                        />
                                     </Tab>
                                     <Tab
                                         className={tabClassNames.tab}
@@ -358,7 +350,7 @@ const GUIComponent = props => {
                                     </Tab>
                                 </TabList>
                                 <TabPanel className={tabClassNames.tabPanel}>
-                                    {costumesTabVisible ? <CostumeTab
+                                    {costumesTabVisible ? <AnimationEditor
                                         vm={vm}
                                     /> : null}
                                 </TabPanel>
