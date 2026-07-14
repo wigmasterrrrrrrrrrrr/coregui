@@ -13,7 +13,6 @@ import {
 } from '../reducers/project-state';
 import {
     activateTab,
-    BLOCKS_TAB_INDEX,
     COSTUMES_TAB_INDEX,
     SOUNDS_TAB_INDEX
 } from '../reducers/editor-tab';
@@ -150,7 +149,6 @@ const mapStateToProps = state => {
         activeTabIndex: state.scratchGui.editorTab.activeTabIndex,
         alertsVisible: state.scratchGui.alerts.visible,
         backdropLibraryVisible: state.scratchGui.modals.backdropLibrary,
-        blocksTabVisible: state.scratchGui.editorTab.activeTabIndex === BLOCKS_TAB_INDEX,
         cardsVisible: state.scratchGui.cards.visible,
         connectionModalVisible: state.scratchGui.modals.connectionModal,
         costumeLibraryVisible: state.scratchGui.modals.costumeLibrary,

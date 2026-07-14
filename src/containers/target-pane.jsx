@@ -8,7 +8,7 @@ import {
     openSpriteLibrary,
     closeSpriteLibrary
 } from '../reducers/modals';
-import {activateTab, COSTUMES_TAB_INDEX, BLOCKS_TAB_INDEX} from '../reducers/editor-tab';
+import {activateTab, COSTUMES_TAB_INDEX} from '../reducers/editor-tab';
 import {setReceivedBlocks} from '../reducers/hovered-target';
 import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 import {setRestore} from '../reducers/restore-deletion';
@@ -130,7 +130,7 @@ class TargetPane extends React.Component {
         });
     }
     handleActivateBlocksTab () {
-        this.props.onActivateTab(BLOCKS_TAB_INDEX);
+        this.props.onActivateTab(COSTUMES_TAB_INDEX);
     }
     handleNewSprite (spriteJSONString) {
         return this.props.vm.addSprite(spriteJSONString)

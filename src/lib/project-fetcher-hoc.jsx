@@ -17,7 +17,7 @@ import {
 } from '../reducers/project-state';
 import {
     activateTab,
-    BLOCKS_TAB_INDEX
+    COSTUMES_TAB_INDEX
 } from '../reducers/editor-tab';
 
 import log from './log';
@@ -95,7 +95,7 @@ const ProjectFetcherHOC = function (WrappedComponent) {
                 this.props.onProjectUnchanged();
             }
             if (this.props.isShowingProject && (prevProps.isLoadingProject || prevProps.isCreatingNew)) {
-                this.props.onActivateTab(BLOCKS_TAB_INDEX);
+                this.props.onActivateTab(COSTUMES_TAB_INDEX);
             }
         }
         fetchProject (projectId, loadingState) {

@@ -1,12 +1,11 @@
 const ACTIVATE_TAB = 'scratch-gui/navigation/ACTIVATE_TAB';
 
 // Constants use numbers to make it easier to work with react-tabs
-const BLOCKS_TAB_INDEX = 0;
-const COSTUMES_TAB_INDEX = 1;
-const SOUNDS_TAB_INDEX = 2;
+const COSTUMES_TAB_INDEX = 0;
+const SOUNDS_TAB_INDEX = 1;
 
 const initialState = {
-    activeTabIndex: BLOCKS_TAB_INDEX
+    activeTabIndex: COSTUMES_TAB_INDEX
 };
 
 const reducer = function (state, action) {
@@ -32,7 +31,6 @@ export {
     reducer as default,
     initialState as editorTabInitialState,
     activateTab,
-    BLOCKS_TAB_INDEX,
     COSTUMES_TAB_INDEX,
     SOUNDS_TAB_INDEX
 };

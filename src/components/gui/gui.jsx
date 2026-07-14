@@ -2,14 +2,13 @@ import classNames from 'classnames';
 import omit from 'lodash.omit';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {defineMessages, FormattedMessage, injectIntl, intlShape} from 'react-intl';
+import {FormattedMessage, injectIntl, intlShape} from 'react-intl';
 import {connect} from 'react-redux';
 import MediaQuery from 'react-responsive';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import tabStyles from 'react-tabs/style/react-tabs.css';
 import VM from 'scratch-vm';
 
-import Blocks from '../../containers/blocks.jsx';
 import CostumeTab from '../../containers/costume-tab.jsx';
 import TargetPane from '../../containers/target-pane.jsx';
 import SoundTab from '../../containers/sound-tab.jsx';
@@ -19,8 +18,6 @@ import Box from '../box/box.jsx';
 import MenuBar from '../menu-bar/menu-bar.jsx';
 import CostumeLibrary from '../../containers/costume-library.jsx';
 import BackdropLibrary from '../../containers/backdrop-library.jsx';
-import Watermark from '../../containers/watermark.jsx';
-
 import Backpack from '../../containers/backpack.jsx';
 import BrowserModal from '../browser-modal/browser-modal.jsx';
 import TipsLibrary from '../../containers/tips-library.jsx';
@@ -46,18 +43,8 @@ import {Theme} from '../../lib/themes';
 import {isRendererSupported, isBrowserSupported} from '../../lib/tw-environment-support-prober';
 
 import styles from './gui.css';
-import addExtensionIcon from './icon--extensions.svg';
-import codeIcon from '!../../lib/tw-recolor/build!./icon--code.svg';
 import costumesIcon from '!../../lib/tw-recolor/build!./icon--costumes.svg';
 import soundsIcon from '!../../lib/tw-recolor/build!./icon--sounds.svg';
-
-const messages = defineMessages({
-    addExtension: {
-        id: 'gui.gui.addExtension',
-        description: 'Button to add an extension in the target pane',
-        defaultMessage: 'Add Extension'
-    }
-});
 
 const getFullscreenBackgroundColor = () => {
     const params = new URLSearchParams(location.search);
@@ -84,8 +71,6 @@ const GUIComponent = props => {
         backdropLibraryVisible,
         backpackHost,
         backpackVisible,
-        blocksId,
-        blocksTabVisible,
         cardsVisible,
         canChangeLanguage,
         canChangeTheme,
@@ -96,14 +81,12 @@ const GUIComponent = props => {
         canSave,
         canCreateCopy,
         canShare,
-        canUseCloud,
         children,
         connectionModalVisible,
         costumeLibraryVisible,
         costumesTabVisible,
         customStageSize,
         enableCommunity,
-        intl,
         isCreating,
         isEmbedded,
         isFullScreen,
@@ -130,8 +113,6 @@ const GUIComponent = props => {
         onActivateSoundsTab,
         onActivateTab,
         onClickLogo,
-        onExtensionButtonClick,
-        onOpenCustomExtensionModal,
         onProjectTelemetryEvent,
         onRequestCloseBackdropLibrary,
         onRequestCloseCostumeLibrary,
@@ -339,17 +320,6 @@ const GUIComponent = props => {
                                 onSelect={onActivateTab}
                             >
                                 <TabList className={tabClassNames.tabList}>
-                                    <Tab className={tabClassNames.tab}>
-                                        <img
-                                            draggable={false}
-                                            src={codeIcon()}
-                                        />
-                                        <FormattedMessage
-                                            defaultMessage="Code"
-                                            description="Button to get to the code panel"
-                                            id="gui.gui.codeTab"
-                                        />
-                                    </Tab>
                                     <Tab
                                         className={tabClassNames.tab}
                                         onClick={onActivateCostumesTab}
@@ -387,39 +357,6 @@ const GUIComponent = props => {
                                         />
                                     </Tab>
                                 </TabList>
-                                <TabPanel className={tabClassNames.tabPanel}>
-                                    <Box className={styles.blocksWrapper}>
-                                        <Blocks
-                                            key={`${blocksId}/${theme.id}`}
-                                            canUseCloud={canUseCloud}
-                                            grow={1}
-                                            isVisible={blocksTabVisible}
-                                            options={{
-                                                media: `${basePath}static/${theme.getBlocksMediaFolder()}/`
-                                            }}
-                                            stageSize={stageSize}
-                                            onOpenCustomExtensionModal={onOpenCustomExtensionModal}
-                                            theme={theme}
-                                            vm={vm}
-                                        />
-                                    </Box>
-                                    <Box className={styles.extensionButtonContainer}>
-                                        <button
-                                            className={styles.extensionButton}
-                                            title={intl.formatMessage(messages.addExtension)}
-                                            onClick={onExtensionButtonClick}
-                                        >
-                                            <img
-                                                className={styles.extensionButtonIcon}
-                                                draggable={false}
-                                                src={addExtensionIcon}
-                                            />
-                                        </button>
-                                    </Box>
-                                    <Box className={styles.watermark}>
-                                        <Watermark />
-                                    </Box>
-                                </TabPanel>
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     {costumesTabVisible ? <CostumeTab
                                         vm={vm}
